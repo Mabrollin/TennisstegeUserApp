@@ -41,10 +41,4 @@ public class LoginController {
 		return new ResponseEntity<>(response, HttpStatus.CREATED);
 	}
 
-	@RequestMapping(value = "/login", method = RequestMethod.POST)
-	public String login(@RequestParam("username") String username, @RequestParam("password") String password) {
-		return userService.login(username, password);
-
-	}
-
 }

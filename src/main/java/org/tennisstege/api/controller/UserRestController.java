@@ -56,7 +56,7 @@ public class UserRestController {
 
 	@RequestMapping(method = RequestMethod.GET, value = "{username}/getLadderNames")
 	public List<String> getLadderNames(@PathVariable String username) {
-		this.validateUser(username);
+		Object principal = SecurityContextHolder.getContext().getAuthentication();
 		Optional<User> user = userService.findByUsername(username);
 		if (user.isPresent()) {
 			return user.get().getLadderNames();
@@ -65,7 +65,4 @@ public class UserRestController {
 		}
 	}
 
-	private void validateUser(String userId) {
-		this.userService.findByUsername(userId).orElseThrow(() -> new UserNotFoundException(userId));
-	}
 }

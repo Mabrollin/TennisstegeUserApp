@@ -29,6 +29,8 @@ import static org.tennisstege.api.security.SecurityConstants.TOKEN_PREFIX;;
 
 public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
 	private AuthenticationManager authenticationManager;
+	
+	ObjectMapper mapper = new ObjectMapper();
 
 	public JWTAuthenticationFilter(AuthenticationManager authenticationManager) {
 		this.authenticationManager = authenticationManager;
@@ -54,6 +56,12 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 		String token = Jwts.builder().setSubject(((User) auth.getPrincipal()).getUsername())
 				.setExpiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
 				.signWith(SignatureAlgorithm.HS512, SECRET.getBytes()).compact();
+		TokenBody tokenBody = new TokenBody(token); 
 		response.addHeader(HEADER_STRING, TOKEN_PREFIX + token);
+	    response.setContentType("application/json");
+	    response.setCharacterEncoding("UTF-8");
+	    response.getWriter().write(mapper.writeValueAsString(tokenBody));
+		response.getWriter().flush();
+		response.getWriter().close();
 	}
 }
