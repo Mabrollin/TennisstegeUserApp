@@ -17,17 +17,14 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.tennisstege.api.JPA.entitymodell.Ladder;
 import org.tennisstege.api.JPA.entitymodell.LadderPlayer;
-import org.tennisstege.api.JPA.entitymodell.User;
 import org.tennisstege.api.body.request.NewLadderDTO;
 import org.tennisstege.api.body.response.LadderPlayerDTO;
 import org.tennisstege.api.body.response.LadderRepresentationDTO;
-import org.tennisstege.api.body.response.SImpleUserDTO;
 import org.tennisstege.api.rest.mapper.LadderMapper;
 import org.tennisstege.api.rest.mapper.LadderPlayerMapper;
 import org.tennisstege.api.rest.mapper.LadderRepresentationMapper;
 import org.tennisstege.api.service.LadderService;
 import org.tennisstege.api.service.PlayerService;
-import org.tennisstege.api.service.UserService;
 import org.tennisstege.api.validator.LadderValidator;
 
 @RestController

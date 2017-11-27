@@ -1,8 +1,6 @@
 package org.tennisstege.api.JPA.entitymodell;
 
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 import javax.persistence.CascadeType;
@@ -16,8 +14,6 @@ import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Entity
 @Table(name = "user")
@@ -38,6 +34,14 @@ public class User {
     @JoinTable(name = "user_role", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "role_id"))
 	private Set<Role> roles;
 	
+	public Set<LadderPlayer> getLadderParticipations() {
+		return ladderParticipations;
+	}
+
+	public void setLadderParticipations(Set<LadderPlayer> ladderParticipations) {
+		this.ladderParticipations = ladderParticipations;
+	}
+
 	public Set<Role> getRoles() {
 		return roles;
 	}
@@ -112,11 +116,6 @@ public class User {
 		this.userContactInfo = userContactInfo;
 	}
 
-	public List<String> getLadderNames() {
-		List<String> names = new ArrayList<>();
-		ladderParticipations.forEach(ladderParticipation -> names.add(ladderParticipation.getLadder().name));
-		return names;
-	}
 
 	public void updateUserContactInfo(UserContactInfo userContactInfo) {
 		this.userContactInfo.updateWith(userContactInfo);

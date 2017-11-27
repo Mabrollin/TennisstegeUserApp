@@ -1,6 +1,5 @@
 package org.tennisstege.api.controller;
 
-import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +13,10 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 import org.tennisstege.api.JPA.entitymodell.User;
 import org.tennisstege.api.JPA.entitymodell.UserContactInfo;
+import org.tennisstege.api.body.request.UserContactInfoDTO;
+import org.tennisstege.api.body.response.SimpleUserDTO;
+import org.tennisstege.api.rest.mapper.ContactInfoMapper;
+import org.tennisstege.api.rest.mapper.SimpleUserMapper;
 import org.tennisstege.api.service.UserService;
 
 @RestController
@@ -22,47 +25,48 @@ public class UserRestController {
 
 	@Autowired
 	private UserService userService;
+	
+	@Autowired
+	private ContactInfoMapper contactInfoMapper;
+	
+	@Autowired
+	private SimpleUserMapper simpleUserMapper;
 
 	UserRestController() {
 
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "{username}/getContactInfo")
-	ResponseEntity<UserContactInfo> getContactInfo(@PathVariable String username) {
+	@RequestMapping(method = RequestMethod.GET, value = "{username}")
+	public ResponseEntity<SimpleUserDTO> getContactInfo(@PathVariable String username) {
 		String principalName = SecurityContextHolder.getContext().getAuthentication().getName();
 		if(!principalName.equals(username)){
 			return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
 		}
 		Optional<User> user = userService.findByUsername(username);
 		if (user.isPresent()) {
-			return new ResponseEntity<UserContactInfo>(user.get().getUserContactInfo(), HttpStatus.OK);
+			SimpleUserDTO response = simpleUserMapper.mapToDTO(user.get());
+			return new ResponseEntity<>(response, HttpStatus.OK);
 		} else {
-			return new ResponseEntity<UserContactInfo>(HttpStatus.NOT_FOUND);
+			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 		}
 	}
 
 	@RequestMapping(method = RequestMethod.PUT, value = "{username}/updateContactInfo")
-	ResponseEntity<UserContactInfo> updateContactInfo(@RequestBody UserContactInfo infoForm,
+	public ResponseEntity<UserContactInfoDTO> updateContactInfo(@RequestBody UserContactInfoDTO infoForm,
 			@PathVariable String username) {
-		//SecurityContextHolder.getContext().getAuthentication().getName();
+		String principalName = SecurityContextHolder.getContext().getAuthentication().getName();
+		if(!principalName.equals(username)){
+			return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+		}
 		Optional<User> user = userService.findByUsername(username);
 		if (user.isPresent()) {
-			return new ResponseEntity<UserContactInfo>(userService.update(user.get(), infoForm), HttpStatus.OK);
+			UserContactInfo update = contactInfoMapper.mapToEntity(infoForm);
+			return new ResponseEntity<UserContactInfoDTO>(contactInfoMapper.mapToDTO(userService.updateContactInfo(user.get(), update)), HttpStatus.OK);
 		} else {
-			return new ResponseEntity<UserContactInfo>(HttpStatus.NOT_FOUND);
+			return new ResponseEntity<UserContactInfoDTO>(HttpStatus.NOT_FOUND);
 		}
 
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "{username}/getLadderNames")
-	public List<String> getLadderNames(@PathVariable String username) {
-		Object principal = SecurityContextHolder.getContext().getAuthentication();
-		Optional<User> user = userService.findByUsername(username);
-		if (user.isPresent()) {
-			return user.get().getLadderNames();
-		} else {
-			return null;
-		}
-	}
 
 }

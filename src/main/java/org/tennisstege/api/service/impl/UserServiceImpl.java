@@ -40,7 +40,7 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
-	public UserContactInfo update(User user, UserContactInfo userContactInfo) {
+	public UserContactInfo updateContactInfo(User user, UserContactInfo userContactInfo) {
 		user.updateUserContactInfo(userContactInfo);
 		userRepository.save(user);
 		return user.getUserContactInfo();
