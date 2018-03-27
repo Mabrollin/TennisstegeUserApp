@@ -1,32 +1,26 @@
 package org.tennisstege.api.JPA.entitymodell;
 
-import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
-import javax.persistence.Table;
 
 /**
  * 
  * @author Markus Brolin, This is a tennis score for now but will become
  *         abstract for future implementations of multiple score types
  */
-@Entity
-@Table(name = "score")
 public class Score {
 
 	@Id
 	@GeneratedValue
-	private Long id;
+	private String id;
 	
-	public Long getId() {
+	public String getId() {
 		return id;
 	}
 
-	public void setId(Long id) {
+	public void setId(String id) {
 		this.id = id;
 	}
-
-	
 
 	private String setsAndBalls;
 

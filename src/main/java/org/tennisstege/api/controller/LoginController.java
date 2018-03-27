@@ -29,13 +29,13 @@ public class LoginController {
 	@RequestMapping(value = "/sign-up", method = RequestMethod.POST)
 	public ResponseEntity<Object> signUp(@RequestBody NewUserDTO userForm, BindingResult bindingResult) {
 
-		User user = newUserMapper.mapToEntity(userForm);
-		userValidator.validate(user, bindingResult);
+		
+		userValidator.validate(userForm, bindingResult);
 
 		if (bindingResult.hasErrors()) {
 			return new ResponseEntity<>(bindingResult.getFieldErrors().toString(), HttpStatus.BAD_REQUEST);
 		}
-
+		User user = newUserMapper.mapToEntity(userForm);
 		NewUserDTO response = newUserMapper.mapToDTO(userService.save(user));
 
 		return new ResponseEntity<>(response, HttpStatus.CREATED);

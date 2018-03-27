@@ -45,16 +45,6 @@ public class UserServiceImpl implements UserService {
 		userRepository.save(user);
 		return user.getUserContactInfo();
 	}
-	@Override
-	public String login(String username, String password){
-		Optional<User> user = findByUsername(username); 
-		if (user.isPresent()){
-			if(bCryptPasswordEncoder.matches(password, user.get().getPassword()))
-				return "ok";
-			else
-				return "wrong password";
-		}
-		else return "user not found";
-	}
+
 }
 	

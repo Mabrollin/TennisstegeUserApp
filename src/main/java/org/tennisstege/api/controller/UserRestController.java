@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.tennisstege.api.JPA.entitymodell.User;
 import org.tennisstege.api.JPA.entitymodell.UserContactInfo;
 import org.tennisstege.api.body.request.UserContactInfoDTO;
-import org.tennisstege.api.body.response.SimpleUserDTO;
+import org.tennisstege.api.body.response.PlayerProfileDTO;
 import org.tennisstege.api.rest.mapper.ContactInfoMapper;
 import org.tennisstege.api.rest.mapper.SimpleUserMapper;
 import org.tennisstege.api.service.UserService;
@@ -37,14 +37,14 @@ public class UserRestController {
 	}
 
 	@RequestMapping(method = RequestMethod.GET, value = "{username}")
-	public ResponseEntity<SimpleUserDTO> getContactInfo(@PathVariable String username) {
+	public ResponseEntity<PlayerProfileDTO> getContactInfo(@PathVariable String username) {
 		String principalName = SecurityContextHolder.getContext().getAuthentication().getName();
 		if(!principalName.equals(username)){
 			return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
 		}
 		Optional<User> user = userService.findByUsername(username);
 		if (user.isPresent()) {
-			SimpleUserDTO response = simpleUserMapper.mapToDTO(user.get());
+			PlayerProfileDTO response = simpleUserMapper.mapToDTO(user.get());
 			return new ResponseEntity<>(response, HttpStatus.OK);
 		} else {
 			return new ResponseEntity<>(HttpStatus.NOT_FOUND);

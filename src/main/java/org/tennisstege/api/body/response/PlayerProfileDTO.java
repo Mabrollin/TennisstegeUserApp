@@ -2,11 +2,12 @@ package org.tennisstege.api.body.response;
 
 import java.util.List;
 
+import org.tennisstege.api.JPA.entitymodell.Ladder;
 import org.tennisstege.api.body.request.UserContactInfoDTO;
 
-public class SimpleUserDTO {
+public class PlayerProfileDTO {
 
-	private List<LadderPlayerDTO> ladderParticipation;
+	private List<LadderDTO> ladderParticipation;
 	private String username;
 	private UserContactInfoDTO contactInfo;
 	public UserContactInfoDTO getContactInfo() {
@@ -17,11 +18,11 @@ public class SimpleUserDTO {
 		this.contactInfo = contactInfo;
 	}
 
-	public List<LadderPlayerDTO> getLadderParticipation() {
+	public List<LadderDTO> getLadderParticipation() {
 		return ladderParticipation;
 	}
 
-	public void setLadderParticipation(List<LadderPlayerDTO> ladderParticipation) {
+	public void setLadderParticipation(List<LadderDTO> ladderParticipation) {
 		this.ladderParticipation = ladderParticipation;
 	}
 

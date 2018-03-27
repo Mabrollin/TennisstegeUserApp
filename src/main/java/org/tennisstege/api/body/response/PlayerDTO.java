@@ -1,9 +1,9 @@
 package org.tennisstege.api.body.response;
 
-public class LadderPlayerDTO {
+public class PlayerDTO {
 	private String username;
-	private String ladderName;
 	private Long rating;
+	private int position;
 
 	public Long getRating() {
 		return rating;
@@ -21,11 +21,12 @@ public class LadderPlayerDTO {
 		this.username = username;
 	}
 
-	public String getLadderName() {
-		return ladderName;
+	public int getPosition() {
+		return position;
 	}
 
-	public void setLadderName(String ladderName) {
-		this.ladderName = ladderName;
+	public void setPosition(int i) {
+		this.position = i;
 	}
+
 }

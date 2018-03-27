@@ -12,7 +12,7 @@ public class NewUserMapper implements Mapper<NewUserDTO, User> {
 	public NewUserDTO mapToDTO(User user) {
 		NewUserDTO newUserDTO = new NewUserDTO();
 		newUserDTO.setUsername(user.getUsername());
-		newUserDTO.setPassword(user.getPassword());
+		//passwords are returned as null	
 		UserContactInfo userContactInfo = user.getUserContactInfo();
 		newUserDTO.setFirstName(userContactInfo.getFirstName());
 		newUserDTO.setLastName(userContactInfo.getLastName());

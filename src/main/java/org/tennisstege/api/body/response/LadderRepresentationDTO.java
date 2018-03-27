@@ -6,7 +6,7 @@ import org.tennisstege.api.body.request.RecordDTO;
 
 public class LadderRepresentationDTO {
 	private String ladderName;
-	private List<LadderPlayerDTO> players;
+	private List<PlayerDTO> players;
 	private List<ChallengeDTO> challenges;
 	private List<RecordDTO> records;
 	public String getLadderName() {
@@ -15,10 +15,10 @@ public class LadderRepresentationDTO {
 	public void setLadderName(String ladderName) {
 		this.ladderName = ladderName;
 	}
-	public List<LadderPlayerDTO> getPlayers() {
+	public List<PlayerDTO> getPlayers() {
 		return players;
 	}
-	public void setPlayers(List<LadderPlayerDTO> players) {
+	public void setPlayers(List<PlayerDTO> players) {
 		this.players = players;
 	}
 	public void setChallenges(List<ChallengeDTO> challenges) {

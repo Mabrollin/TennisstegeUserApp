@@ -19,6 +19,14 @@ public class DataLoader implements ApplicationRunner {
 
     public void run(ApplicationArguments args) {
     	//creates role 'USER'
-        roleRepository.save(new Role("USER"));
+    	if(roleRepository.findByName("USER").isPresent()){
+    		System.out.println("User Role exist");
+    	}
+    	else {
+    		System.out.println("User Role doesn't exist");
+    		System.out.println("Creating User Role...");
+    		roleRepository.save(new Role("USER"));
+    		System.out.println("User Role created succesfully!");
+    	}
     }
 }

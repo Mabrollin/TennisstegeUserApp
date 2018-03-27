@@ -3,42 +3,37 @@ package org.tennisstege.api.JPA.entitymodell;
 import java.util.HashSet;
 import java.util.Set;
 
-import javax.persistence.CascadeType;
-import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
-import javax.persistence.OneToMany;
-import javax.persistence.OneToOne;
-import javax.persistence.Table;
 
-@Entity
-@Table(name = "user")
+import org.springframework.data.mongodb.core.mapping.DBRef;
+
 public class User {
 	
-	@OneToMany(cascade = CascadeType.ALL, mappedBy="player")
-	private Set<LadderPlayer> ladderParticipations;
+	public String password;
+	public String username;
+	
+	@DBRef
+	private Set<Ladder> ladderParticipations;
 	
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
-	private Long id;
+	private String id;
 	
-	@OneToOne(cascade = CascadeType.ALL)
-	@JoinColumn(name = "user_contact_info_id")
 	private UserContactInfo userContactInfo;
 	
-	@ManyToMany
-    @JoinTable(name = "user_role", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "role_id"))
+	@DBRef
 	private Set<Role> roles;
 	
-	public Set<LadderPlayer> getLadderParticipations() {
+	public Set<Ladder> getLadderParticipations() {
 		return ladderParticipations;
 	}
 
-	public void setLadderParticipations(Set<LadderPlayer> ladderParticipations) {
+	public void setLadderParticipations(Set<Ladder> ladderParticipations) {
 		this.ladderParticipations = ladderParticipations;
 	}
 
@@ -50,11 +45,11 @@ public class User {
 		this.roles = roles;
 	}
 	
-	public Long getId() {
+	public String getId() {
 		return id;
 	}
 
-	public void setId(long id) {
+	public void setId(String id) {
 		this.id = id;
 	}
 
@@ -66,14 +61,6 @@ public class User {
 		this.password = password;
 	}
 
-	public String getPasswordConfirm() {
-		return passwordConfirm;
-	}
-
-	public void setPasswordConfirm(String passwordConfirm) {
-		this.passwordConfirm = passwordConfirm;
-	}
-
 	public String getUsername() {
 		return username;
 	}
@@ -82,10 +69,6 @@ public class User {
 		this.username = username;
 	}
 
-	public String password;
-	public String passwordConfirm;
-	public String username;
-
 	public User(String name, String password) {
 		this.username = name;
 		this.password = password;
@@ -93,8 +76,10 @@ public class User {
 		this.roles = new HashSet<>();
 		
 	}
-
-	User() { // jpa only
+	
+	User(){
+		ladderParticipations = new HashSet<>();
+		roles = new HashSet<>();
 	}
 
 	public User(User input) {
@@ -104,8 +89,35 @@ public class User {
 		this.userContactInfo = input.userContactInfo;
 	}
 
-	public void setId(Long id) {
-		this.id = id;
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((id == null) ? 0 : id.hashCode());
+		result = prime * result + ((username == null) ? 0 : username.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		User other = (User) obj;
+		if (id == null) {
+			if (other.id != null)
+				return false;
+		} else if (!id.equals(other.id))
+			return false;
+		if (username == null) {
+			if (other.username != null)
+				return false;
+		} else if (!username.equals(other.username))
+			return false;
+		return true;
 	}
 
 	public UserContactInfo getUserContactInfo() {

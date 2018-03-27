@@ -14,5 +14,5 @@ public interface ChallengeService {
 	Challenge updateChallenge(Challenge challengeToUpdate, ChallengeUpdate update);
 	Record cancelChallenge(Challenge challengeToCancel, String reason);
 	Record recordChallenge(Challenge challengeToRecord, Score score, MatchOutcome matchOutcome, Duration duration);
-	Challenge getChallenge(Long challengeId);
+	Challenge getChallenge(String challengeId);
 }

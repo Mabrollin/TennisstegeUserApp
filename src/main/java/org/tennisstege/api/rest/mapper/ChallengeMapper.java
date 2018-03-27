@@ -8,16 +8,16 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Component;
 import org.tennisstege.api.JPA.entitymodell.Challenge;
 import org.tennisstege.api.JPA.entitymodell.Ladder;
-import org.tennisstege.api.JPA.entitymodell.LadderPlayer;
+import org.tennisstege.api.JPA.entitymodell.User;
 import org.tennisstege.api.body.response.ChallengeDTO;
 import org.tennisstege.api.service.LadderService;
-import org.tennisstege.api.service.PlayerService;
+import org.tennisstege.api.service.UserService;
 
 @Component
 public class ChallengeMapper implements Mapper<ChallengeDTO, Challenge> {
 
 	@Autowired
-	private PlayerService ladderPlayerService;
+	private UserService userService;
 
 	@Autowired
 	private LadderService ladderService;
@@ -26,9 +26,9 @@ public class ChallengeMapper implements Mapper<ChallengeDTO, Challenge> {
 	public Challenge mapToEntity(ChallengeDTO body) {
 		Ladder ladder = ladderService.findByName(body.getLadderName())
 				.orElseThrow(() -> new UsernameNotFoundException(body.getLadderName()));
-		LadderPlayer challenger = ladderPlayerService.findByLadderAndUsername(ladder, body.getChallengerPlayerName())
+		User challenger = userService.findByUsername(body.getChallengerPlayerName())
 				.orElseThrow(() -> new UsernameNotFoundException(body.getChallengerPlayerName()));
-		LadderPlayer challenged = ladderPlayerService.findByLadderAndUsername(ladder, body.getChallengedPlayerName())
+		User challenged = userService.findByUsername(body.getChallengedPlayerName())
 				.orElseThrow(() -> new UsernameNotFoundException(body.getChallengedPlayerName()));
 
 		Challenge challenge = new Challenge(challenger, challenged, LocalDateTime.now(), ladder);
@@ -41,12 +41,12 @@ public class ChallengeMapper implements Mapper<ChallengeDTO, Challenge> {
 		ChallengeDTO challengeDTO = new ChallengeDTO();
 		challengeDTO.setId(challenge.getId());
 		if (challenge.getChallengedPlayer() != null)
-			challengeDTO.setChallengedPlayerName(challenge.getChallengedPlayer().getPlayer().getUsername());
+			challengeDTO.setChallengedPlayerName(challenge.getChallengedPlayer().getUsername());
 		else
 			challengeDTO.setChallengedPlayerName(null);
 
 		if (challenge.getChallengerPlayer() != null)
-			challengeDTO.setChallengerPlayerName(challenge.getChallengerPlayer().getPlayer().getUsername());
+			challengeDTO.setChallengerPlayerName(challenge.getChallengerPlayer().getUsername());
 		else
 			challengeDTO.setChallengerPlayerName(null);
 

@@ -3,29 +3,22 @@ package org.tennisstege.api.JPA.entitymodell;
 import java.time.Duration;
 import java.time.LocalDateTime;
 
-import javax.persistence.CascadeType;
-import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToOne;
-import javax.persistence.Table;
 
-@Entity
-@Table(name = "record")
+import org.springframework.data.mongodb.core.mapping.DBRef;
+
 public class Record {
 
 	@Id
 	@GeneratedValue
-	private Long id;
-	@ManyToOne
-	@JoinColumn(name = "challenger_id", nullable = false)
-	private LadderPlayer challengerPlayer;
+	private String id;
+	
+	@DBRef
+	private User ChallengerPlayer;
 
-	@ManyToOne
-	@JoinColumn(name = "challenged_id", nullable = false)
-	private LadderPlayer challengedPlayer;
+	@DBRef
+	private User ChallengedPlayer;
 
 	@GeneratedValue
 	private LocalDateTime created;
@@ -34,8 +27,6 @@ public class Record {
 
 	private MatchOutcome matchOutcome;
 
-	@OneToOne(cascade = CascadeType.ALL)
-	@JoinColumn(name = "score_id")
 	private Score score;
 
 	private String reason;
@@ -48,32 +39,31 @@ public class Record {
 		this.reason = reason;
 	}
 
-	@ManyToOne
-	@JoinColumn(name = "ladder_id", nullable = false)
+	@DBRef
 	private Ladder ladder;
 
-	public Long getId() {
+	public String getId() {
 		return id;
 	}
 
-	public void setId(Long id) {
+	public void setId(String id) {
 		this.id = id;
 	}
 
-	public LadderPlayer getChallengerPlayer() {
-		return challengerPlayer;
+	public User getChallengerPlayer() {
+		return ChallengerPlayer;
 	}
 
-	public void setChallengerPlayer(LadderPlayer challengerPlayer) {
-		this.challengerPlayer = challengerPlayer;
+	public void setChallengerPlayer(User ChallengerPlayer) {
+		this.ChallengerPlayer = ChallengerPlayer;
 	}
 
-	public LadderPlayer getChallengedPlayer() {
-		return challengedPlayer;
+	public User getChallengedPlayer() {
+		return ChallengedPlayer;
 	}
 
-	public void setChallengedPlayer(LadderPlayer challengedPlayer) {
-		this.challengedPlayer = challengedPlayer;
+	public void setChallengedPlayer(User ChallengedPlayer) {
+		this.ChallengedPlayer = ChallengedPlayer;
 	}
 
 	public LocalDateTime getCreated() {
@@ -116,11 +106,11 @@ public class Record {
 		this.ladder = ladder;
 	}
 
-	public Record(LadderPlayer challengerPlayer, LadderPlayer challengedPlayer, LocalDateTime created,
+	public Record(User ChallengerPlayer, User ChallengedPlayer, LocalDateTime created,
 			Duration duration, MatchOutcome matchOutcome, Score score, Ladder ladder, String reason) {
 		super();
-		this.challengerPlayer = challengerPlayer;
-		this.challengedPlayer = challengedPlayer;
+		this.ChallengerPlayer = ChallengerPlayer;
+		this.ChallengedPlayer = ChallengedPlayer;
 		this.created = created;
 		this.duration = duration;
 		this.matchOutcome = matchOutcome;
@@ -146,16 +136,16 @@ public class Record {
 
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
-		sb.append("Match between ").append(challengerPlayer).append(" and ").append(challengedPlayer);
+		sb.append("Match between ").append(ChallengerPlayer).append(" and ").append(ChallengedPlayer);
 		switch (matchOutcome) {
 		case CANCELLED:
 			sb.append("was cancelled due to ").append(reason);
 			break;
 		case CHALLANGED_WON:
-			sb.append("was won by: ").append(this.challengedPlayer);
+			sb.append("was won by: ").append(this.ChallengedPlayer);
 			break;
 		case CHALLANGER_WON:
-			sb.append("was won by: ").append(this.challengerPlayer);
+			sb.append("was won by: ").append(this.ChallengerPlayer);
 			break;
 		case DRAW:
 			sb.append("was a draw");

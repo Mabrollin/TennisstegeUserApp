@@ -43,6 +43,7 @@ public class ScoreMapper implements Mapper<ScoreDTO, Score> {
 			score.setSetsAndBalls(mapper.writeValueAsString(dto.getSetsAndGames()));
 		} catch (JsonProcessingException e) {
 			// TODO rethrow?k
+			System.out.println(e);
 			e.printStackTrace();
 		}
 		return score;

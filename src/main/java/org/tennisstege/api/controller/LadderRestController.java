@@ -1,13 +1,13 @@
 package org.tennisstege.api.controller;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -16,13 +16,13 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.tennisstege.api.JPA.entitymodell.Ladder;
-import org.tennisstege.api.JPA.entitymodell.LadderPlayer;
+import org.tennisstege.api.JPA.entitymodell.Player;
 import org.tennisstege.api.body.request.NewLadderDTO;
-import org.tennisstege.api.body.response.LadderPlayerDTO;
 import org.tennisstege.api.body.response.LadderRepresentationDTO;
-import org.tennisstege.api.rest.mapper.LadderMapper;
-import org.tennisstege.api.rest.mapper.LadderPlayerMapper;
+import org.tennisstege.api.body.response.PlayerDTO;
 import org.tennisstege.api.rest.mapper.LadderRepresentationMapper;
+import org.tennisstege.api.rest.mapper.NewLadderMapper;
+import org.tennisstege.api.rest.mapper.PlayerMapper;
 import org.tennisstege.api.service.LadderService;
 import org.tennisstege.api.service.PlayerService;
 import org.tennisstege.api.validator.LadderValidator;
@@ -30,9 +30,9 @@ import org.tennisstege.api.validator.LadderValidator;
 @RestController
 @RequestMapping(value = "/ladder")
 public class LadderRestController {
-
+	
 	@Autowired
-	private LadderMapper ladderMapper;
+	private NewLadderMapper newLadderMapper;
 
 	@Autowired
 	private LadderValidator ladderValidator;
@@ -41,7 +41,7 @@ public class LadderRestController {
 	private LadderRepresentationMapper ladderRepresentationMapper;
 	
 	@Autowired
-	private LadderPlayerMapper ladderPlayerMapper;
+	private PlayerMapper ladderPlayerMapper;
 	
 	@Autowired
 	private LadderService ladderService;
@@ -52,6 +52,15 @@ public class LadderRestController {
 	LadderRestController() {
 	}
 
+	public class UserAlreadyExistsInLadderException extends RuntimeException {
+
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = 1619695157014732622L;
+		
+	}
+	
 	@RequestMapping(method = RequestMethod.GET, value = "/{ladderName}")
 	@ResponseBody
 	ResponseEntity<LadderRepresentationDTO> getLadder(@PathVariable String ladderName) {
@@ -62,38 +71,44 @@ public class LadderRestController {
 			return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
 		}
 	}
-	@RequestMapping(method = RequestMethod.GET, value = "/{ladderName}/getPlayers")
-	@ResponseBody
-	ResponseEntity<List<LadderPlayerDTO>> getUsers(@PathVariable String ladderName) {
-		Optional<Ladder> ladder = ladderService.findByName(ladderName);
-		if (ladder.isPresent()) {
-			Set<LadderPlayer> players = ladder.get().getPlayers();
-			List<LadderPlayerDTO> playerDTOList = new ArrayList<>();
-			players.forEach(player -> playerDTOList.add(ladderPlayerMapper.mapToDTO(player)));
-			return new ResponseEntity<>(playerDTOList, HttpStatus.OK);
-		} else {
-			return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
-		}
-	}
 
-	@RequestMapping(method = RequestMethod.PUT, value = "/addPlayer")
-	ResponseEntity<?> addPlayer(@RequestBody LadderPlayerDTO playerForm) {
-		LadderPlayer player = ladderPlayerMapper.mapToEntity(playerForm);
-		LadderPlayerDTO response = ladderPlayerMapper.mapToDTO(playerService.save(player));
-		return new ResponseEntity<>(response, HttpStatus.CREATED);
+	@RequestMapping(method = RequestMethod.PUT, value = "/{ladderName}/addPlayer")
+	ResponseEntity<?> addPlayer(@PathVariable String ladderName, @RequestBody PlayerDTO playerForm) {
+		Optional<Ladder> ladder = ladderService.findByName(ladderName);
+		Player player = ladderPlayerMapper.mapToEntity(playerForm);
+		if(ladder.isPresent()){
+			playerService.addPlayerToLadder(ladder.get(), player);
+			return new ResponseEntity<>(HttpStatus.OK);
+		}
+		else {
+			return new ResponseEntity<>(ladderName, HttpStatus.NOT_FOUND);
+		}
 	}
 	
-	@RequestMapping(method = RequestMethod.POST, value = "/new")
+	@RequestMapping(method = RequestMethod.POST)
 	ResponseEntity<?> createLadder(@RequestBody NewLadderDTO ladderForm, BindingResult bindingResult) {
-		Ladder ladder = ladderMapper.mapToEntity(ladderForm);
-		ladderValidator.validate(ladder, bindingResult);
+		String principalName = SecurityContextHolder.getContext().getAuthentication().getName();
+		if(!principalName.equals(ladderForm.getCreator())){
+			return new ResponseEntity<>(ladderForm.getCreator(), HttpStatus.UNAUTHORIZED);
+		}
+		
+		ladderValidator.validate(ladderForm, bindingResult);
 		if (bindingResult.hasErrors()) {
 			return new ResponseEntity<>(bindingResult, HttpStatus.BAD_REQUEST);
-		} else {
-			NewLadderDTO response = ladderMapper.mapToDTO(ladderService.save(ladder));
-			return new ResponseEntity<>(response, HttpStatus.CREATED);
-
 		}
+		
+		Ladder ladder = newLadderMapper.mapToEntity(ladderForm);
+		Player player = new Player(ladder.getAdmins().iterator().next(), 1500l);
+		playerService.addPlayerToLadder(ladder, player);
+		NewLadderDTO response = newLadderMapper.mapToDTO(ladderService.save(ladder));
+		return new ResponseEntity<>(response, HttpStatus.CREATED);
+
+	}
+	@RequestMapping(method = RequestMethod.GET, value = "/search")
+	ResponseEntity<List<String>> getLadderNames(@RequestBody String name) {
+		List<Ladder> result = ladderService.searchByName(name);
+		List<String> response = result.stream().map(ladder -> ladder.getName()).collect(Collectors.toList());
+		return new ResponseEntity<>(response, HttpStatus.CREATED);
 	}
 
 }
